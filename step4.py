@@ -1,14 +1,16 @@
-import gzip
+import os, sys, pathlib
+"""
+I couln't find a way to close gzip.open handle so every fasta.gz loaded remained
+in memory. By running a seperate python script in the for loop below I was able
+to open and close each gzip.open handle and keep the memory usage to a minimum
 
-import os, sys
+The script take a coordinate_list.tsv file that contains the name of the inbred,
+chromsome, coordinates. It creates a fasta file for each locus in the "fasta_loci/"
+folder, which is automatically generated if needed.
+"""
 
-import pandas as pd
-
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
-from Bio.SeqFeature import SeqFeature, FeatureLocation
+import pathlib
+pathlib.Path(sys.argv[1]+"/fasta_loci").mkdir(parents=True, exist_ok=True)
 
 fasta_dict = {
 'ZxPI566673': "Zx-PI566673-REFERENCE-YAN-1.0.fa.gz",
@@ -42,9 +44,8 @@ fasta_dict = {
 'CML103': "Zm-CML103-REFERENCE-NAM-1.0.fasta.gz"
 }
 
-with open("coordinate_list.tsv","r") as handle:
+with open(sys.argv[1]+"/coordinate_list.tsv","r") as handle:
     for line in handle:
         # ['B73', '1', '283893731', '284129080']
         line = [s.rstrip() for s in line.split("\t")]  # removes \n from all cells in list
-        os.system("python3 fasta_retriever.py "+line[0]+" "+fasta_dict[line[0]]+" "+line[1]+" "+line[2]+" "+line[3])
-#os.system("cat fasta_loci/*.fasta > fasta_loci/combined.fasta")
+        os.system("python3 fasta_retriever.py "+sys.argv[1]+" "+line[0]+" "+fasta_dict[line[0]]+" "+line[1]+" "+line[2]+" "+line[3])
