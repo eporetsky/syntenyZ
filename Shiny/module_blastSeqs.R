@@ -35,7 +35,7 @@ blastSeqs <- function(input, output, session) {
   
   select_genotypes <- reactiveVal()
   observeEvent(input$save_genotypes, {
-    print(input$select_genotypes)
+    #print(input$select_genotypes)
     select_genotypes(input$select_genotypes)
   })
   
@@ -63,14 +63,12 @@ blastSeqs <- function(input, output, session) {
   observeEvent(input$blast_query, {
     project_name <- isolate(input$project_name)
     selected_genotypes <- select_genotypes()
-    print(selected_genotypes)
     selected_str <- selected_genotypes[1]
     for(name in selected_genotypes[2:length(selected_genotypes)]){
-      name <- paste("BLASTdb/", name, sep="")
       selected_str <- paste(selected_str, name, sep=".db ")
     }
-    selected_str <- paste("BLASTdb/", selected_str, ".db", sep="")
-    print(paste("python global/blast_project.py", project_name, selected_str, sep=" "))
+    selected_str <- paste(selected_str, ".db", sep="")
+    #print(paste("python global/blast_project.py", project_name, selected_str, sep=" "))
     system(paste("python global/blast_project.py", project_name, selected_str, sep=" "))
     output$finished_blast_query <- renderText(paste("Finished blast query ", project_name))
   })
