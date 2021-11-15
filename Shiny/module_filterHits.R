@@ -54,4 +54,6 @@ filterHits <- function(input, output, session, project_name) {
     write.table(working_table(), paste("projects/",project_name(),"/blast_results_filtered.tsv", sep=""), 
                 sep="\t", quote=F, row.names=F, col.names=F)
   })
+  
+  
 }

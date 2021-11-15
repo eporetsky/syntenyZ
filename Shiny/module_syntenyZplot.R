@@ -8,8 +8,11 @@ syntenyZplotUI <- function(id) {
       sidebarPanel(width = 4,
         numericInput(ns("word_size"), "Select Word Size:", value=100),
         numericInput(ns("e_value"), "Select e-value:", value=10),
-        actionButton(ns("combined_blast_button"), "Blast combined fasta"),
-        actionButton(ns("masked_blast_button"), "Blast masked fasta"),
+        actionButton(ns("run_combined_blast"), "Blast combined fasta"),
+        actionButton(ns("run_masked_blast"), "Blast masked fasta"),
+        hr(),
+        actionButton(ns("load_combined_blastall"), "Load combined blastall"),
+        actionButton(ns("load_masked_blastall"), "Load masked blastall"),
         hr(),
         checkboxInput(ns("do_gene_xlim"), "Do gene xlim:", value=F),
         numericInput(ns("plot_height"), "Plot Height:",value=500),
@@ -23,7 +26,7 @@ syntenyZplotUI <- function(id) {
           orientation = "horizontal",
           add_rank_list(
             text = "Include",
-            labels = lsf,
+            labels = ns("genotype_list"),
             input_id = ns("seg_names")
           ),
           add_rank_list(
@@ -50,19 +53,37 @@ syntenyZplot <- function(input, output, session, project_name) {
   
   output$current_project_name <- renderText({project_name()})
   
-  reactive <- lsf <- list.files(path = paste(getwd(),"projects/PROPEP4/custom_CDS/inbreds/", sep="/"), pattern = NULL)
-  lsf <- sub('\\.fasta$', '', lsf)[1:10]
+   
+  output$genotype_list <- sub('\\.fasta$', '', 
+                  list.files(path = paste("projects/",project_name(), "/custom_CDS/inbreds/", sep=""), pattern = NULL))
   
-  system("makeblastdb -dbtype nucl -in fasta_loci/combined.fasta -out fasta_loci/combined.db")
-  system("blastn -db fasta_loci/combined.db -query fasta_loci/combined.fasta -out blastall.tsv -num_threads 4 -word_size 100 -evalue 10 -outfmt 6 ")
-  blastall <- read_comparison_from_blast("blastall.tsv")
+  output$seg_names_print <- renderPrint(input$seg_names) # This matches the input_id of the first rank list)
   
-  
-  output$seg_names_print <-
-    renderPrint(
-      input$rank_list_1 # This matches the input_id of the first rank list
-    )
-  
+  blastall <- reactiveVal()
+  observeEvent(input$run_combined_blast, {
+    system(paste("makeblastdb -dbtype nucl -in ", "projects/", project(name), 
+                 "/fasta_loci/combined.fasta -out fasta_loci/combined.db", sep=""))
+    system(paste("blastn -db ", 
+                 "projects/", project(name), "/fasta_loci/combined.db -query ",
+                 "projects/", project(name), "/fasta_loci/combined.fasta -out ",
+                 "projects/", project(name), "/blastall_combined.tsv -num_threads 4 -word_size 100 -evalue 10 -outfmt 6 ", sep=""))
+    blastall(read_comparison_from_blast(paste("projects/", project_name(), "blastall_combined.tsv", sep="")))
+  })
+  observeEvent(input$run_masked_blast, {
+    system(paste("makeblastdb -dbtype nucl -in ", "projects/", project(name), 
+                 "/fasta_loci/combined_masked.fasta -out fasta_loci/combined_masked.db", sep=""))
+    system(paste("blastn -db ", 
+                 "projects/", project(name), "/fasta_loci/combined_masked.db -query ",
+                 "projects/", project(name), "/fasta_loci/combined_masked.fasta -out ",
+                 "projects/", project(name), "/blastall_masked.tsv -num_threads 4 -word_size 100 -evalue 10 -outfmt 6 ", sep=""))
+    blastall(read_comparison_from_blast(paste("projects/", project_name(), "blastall_masked.tsv", sep="")))
+  })
+  observeEvent(input$load_combined_blastall, {
+    blastall(read_comparison_from_blast(paste("projects/", project_name(), "blastall_combined.tsv", sep="")))
+  })
+  observeEvent(input$load_masked_blastall, {
+    blastall(read_comparison_from_blast(paste("projects/", project_name(), "blastall_masked.tsv", sep="")))
+  })
   
   update_plot <- reactive({
     input$update_button

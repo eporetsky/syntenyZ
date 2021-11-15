@@ -41,7 +41,7 @@ blastSeqs <- function(input, output, session) {
   
   project_name <- reactiveVal()
   observeEvent(input$project_save, {
-    system(paste("python global/create_project.py", input$project_name, sep=" "))
+    system(paste("python3 global/create_project.py", input$project_name, sep=" "))
     output$current_project_name <- renderText(paste("Current project is: ", input$project_name))
     project_name(input$project_name)
   })
