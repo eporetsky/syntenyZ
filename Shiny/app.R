@@ -6,6 +6,8 @@
 ######################################################
 # Install packages that are not yet installed and loads them
 # Based on - https://vbaliga.github.io/verify-that-r-packages-are-installed-and-loaded/
+#system("python3 --version")
+
 package.check <- lapply(
   c("shiny","shinythemes", "genoPlotR", "RColorBrewer", "sortable", "DT"),
   FUN = function(x) {
@@ -15,7 +17,6 @@ package.check <- lapply(
     }
   }
 )
-
 #source("global.R")                # Loads default_files.csv to specifit which files to load when MutRank starts
 source("module_blastSeqs.R")        # Shiny module that handles loading user specified data for the analysis
 source("module_filterHits.R")     # Shiny module that handles the caluclation and printing of the Mutual Rank table 

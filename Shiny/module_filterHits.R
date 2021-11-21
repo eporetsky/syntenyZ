@@ -1,6 +1,3 @@
-test <- read.table(paste("projects/","123","/blast_results.tsv", sep=""), sep="\t")
-write.table(test, paste("projects/","123","/blast_results_filtered.tsv", sep=""), sep="\t", quote=F, row.names=F, col.names=F)
-?write.table
 filterHitsUI <- function(id) {
   ns <- NS(id)
   tabPanel("Filter Hits",
@@ -54,6 +51,4 @@ filterHits <- function(input, output, session, project_name) {
     write.table(working_table(), paste("projects/",project_name(),"/blast_results_filtered.tsv", sep=""), 
                 sep="\t", quote=F, row.names=F, col.names=F)
   })
-  
-  
 }

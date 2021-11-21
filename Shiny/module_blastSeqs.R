@@ -69,7 +69,8 @@ blastSeqs <- function(input, output, session) {
     }
     selected_str <- paste(selected_str, ".db", sep="")
     #print(paste("python global/blast_project.py", project_name, selected_str, sep=" "))
-    system(paste("python global/blast_project.py", project_name, selected_str, sep=" "))
+    system(paste("rm projects/", project_name, "/blast_results.tsv", sep=""))
+    system(paste("python3 global/blast_project.py", project_name, selected_str, sep=" "))
     output$finished_blast_query <- renderText(paste("Finished blast query ", project_name))
   })
   

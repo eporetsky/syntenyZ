@@ -1,4 +1,4 @@
-import os, sys, pathlib
+import os, sys
 from collections import OrderedDict
 from collections import defaultdict
 import pandas as pd
@@ -6,6 +6,8 @@ from Bio.Seq import Seq
 from Bio import SeqIO
 import os
 project_folder = "projects/"+sys.argv[1]+"/"
+
+print(sys.argv)
 
 #######################################################################################################################
 ######################## Part 0 - Generate a list of coordinates using relative start site ############################
