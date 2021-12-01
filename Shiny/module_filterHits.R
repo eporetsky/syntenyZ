@@ -10,6 +10,8 @@ filterHitsUI <- function(id) {
           hr(),
           actionButton(ns("delete_rows"), "Delete selected rows"),
           actionButton(ns("save_filtered_results"), "Save filtered results"),
+          hr(),
+          actionButton(ns("extract_synteny"), "Start synteny extraction"),
         ),
 
   mainPanel(width=8,
@@ -38,17 +40,24 @@ filterHits <- function(input, output, session, project_name) {
   observeEvent(input$open_raw_results, {
     working_table(read.table(paste("projects/",project_name(),"/blast_results.tsv", sep=""), sep="\t"))
     output$blast_table <- renderDataTable(working_table(),
-      options = list(pageLength = 100, width="100%", scrollX = TRUE))
+      options = list(pageLength = 1000, width="100%", scrollX = TRUE))
   })
   
   observeEvent(input$open_filtered_results, {
     working_table(read.table(paste("projects/",project_name(),"/blast_results_filtered.tsv", sep=""), sep="\t"))
     output$blast_table <- renderDataTable(working_table(),
-                                          options = list(pageLength = 100, width="100%", scrollX = TRUE))
+                                          options = list(pageLength = 1000, width="100%", scrollX = TRUE))
   })
   
   observeEvent(input$save_filtered_results, {
     write.table(working_table(), paste("projects/",project_name(),"/blast_results_filtered.tsv", sep=""), 
                 sep="\t", quote=F, row.names=F, col.names=F)
+  })
+  
+  observeEvent(input$extract_synteny, {
+    print("Delete previous fasta")
+    system(paste("rm projects/", project_name(), "/fasta_loci/combined.fasta", sep=""))
+    system(paste("rm projects/", project_name(), "/fasta_loci/combined_masked.fasta", sep=""))
+    system(paste("python3 global/extract_results.py", project_name(), sep=" "))
   })
 }

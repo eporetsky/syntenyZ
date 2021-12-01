@@ -15,11 +15,13 @@ syntenyZplotUI <- function(id) {
             actionButton(ns("load_masked_blastall"), "Load masked blastall"),
             hr(),
             checkboxInput(ns("do_gene_xlim"), "Do gene xlim:", value=T),
-            numericInput(ns("plot_height"), "Plot Height:",value=500),
-            numericInput(ns("plot_width"), "Plot Width:",value=300),
+            numericInput(ns("plot_height"), "Plot Height:",value=1500),
+            numericInput(ns("plot_width"), "Plot Width:",value=1000),
             numericInput(ns("low_color_percent"), "Select Minimum % Similarity:", value=90),
             selectInput(ns("select_annotation"), label="Select annotation:", choices=c("custom","gff3","NA"), selected="custom"),
             actionButton(ns("update_button"), "Update plot"),
+            hr(),
+            downloadButton(ns('download_plot'),"Download PDF (not working)"),
             # https://rstudio.github.io/sortable/articles/built_in.html
             htmlOutput(ns("bucketlist"))
          ),
@@ -87,33 +89,40 @@ syntenyZplot <- function(input, output, session, project_name) {
     blastall(read_comparison_from_blast(paste("projects/", project_name(), "/blastall_masked.tsv", sep="")))
   })
   
-  plot_reactive <- observeEvent(input$update_button, {
+  # Shiny handle for downloading the plot as pdf
+  output$download_plot <- downloadHandler(
+    filename ="syntenyZ_plot.pdf",
+    content = function(file) {
+      file.copy("www/syntenyZ_plot.pdf", file)
+    }
+    
+  )
+  
+  observeEvent(input$update_button, {
+    plot_height <- isolate(input$plot_height)
+    plot_width <- isolate(input$plot_width)
     do_gene_xlim <- ifelse(input$do_gene_xlim==1, TRUE, FALSE)
     # If the selected method is a single reference gene it returns the first gene even if given a gene list
-    output$plot <- renderPlot((MygenoPlotR(project_name=project_name(),
-                blastall=blastall(),
-                do_gene_xlim=do_gene_xlim,
-                plot_height=input$plot_height, # Don't think it is working
-                plot_width=input$plot_width,
-                exon_mode="custom", # gff3 or exon
-                gene_annot = input$select_annotation,
-                annotation_cex = 1,
-                annotation_height = 1,
-                seg_names=input$seg_names,
-                gene_colors=gene_colors,
-                add_intron=F,
-                annot=T,
-                arrow_len = 10000,
-                text_color = "black",
-                low_color_percent = input$low_color_percent)),
-          width = function() input$plot_width,
-          height = function() input$plot_height)
-    })
-  
-  # Call the ggplot function that creates that heatmap
-  output$plot <- renderPlot(plot_reactive,
-                            width = function() input$plot_width,
-                            height = function() input$plot_height)
+    
+    output$plot <- renderPlot(MygenoPlotR(project_name=project_name(),
+                                           blastall=blastall(),
+                                           do_gene_xlim=do_gene_xlim,
+                                           plot_height=input$plot_height, # Don't think it is working
+                                           plot_width=input$plot_width,
+                                           exon_mode="custom", # gff3 or exon
+                                           gene_annot = input$select_annotation,
+                                           annotation_cex = 1,
+                                           annotation_height = 1,
+                                           seg_names=input$seg_names,
+                                           gene_colors=gene_colors,
+                                           add_intron=F,
+                                           annot=T,
+                                           arrow_len = 10000,
+                                           text_color = "black",
+                                           low_color_percent = input$low_color_percent),
+                              width = function() input$plot_width,
+                              height = function() input$plot_height)
+  })
   
 }
 
@@ -192,12 +201,12 @@ MygenoPlotR <- function(
                                                       lty=1,lwd=1,cex=1))
     }
   }
-  #names(dna_segs)<-seg_names # used to plot the names on the figure
+  names(dna_segs)<-seg_names # used to plot the names on the figure
   #color_limit <- rep(1,13)
   #color_limit[7] <- low_color_percent
   #comp_list[[1]] <- rbind(comp_list[[1]], color_limit)
-  print(dna_segs)
-  #pdf(paste(project_name,".pdf",sep=""),width=plot_width,height=plot_height)
+  #print(dna_segs)
+  
   return(plot_gene_map(dna_segs=dna_segs,
                        seg_plot_height=plot_height,
                        #dna_seg_labels = names(tree_barto$leaves),

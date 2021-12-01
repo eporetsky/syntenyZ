@@ -1,5 +1,5 @@
 ######################################################
-## syntenyZ Version 0.1
+## syntenyZ Version 0.2
 ## Written by Elly Poretsky
 ## Alisa Huffaker Lab
 ## University of California, San Diego
@@ -26,7 +26,7 @@ source("module_syntenyZplot.R")   # Shiny module that handles plotting the Mutua
 
 # Shiny UI function
 ui <- fluidPage(
-  navbarPage("syntenyZ v0.1",
+  navbarPage("syntenyZ v0.2",
              theme = shinytheme("flatly"),
              blastSeqsUI("blastSeqsNS"),
              filterHitsUI("filterHitsNS"),

@@ -7,8 +7,8 @@ correctMatchesUI <- function(id) {
           htmlOutput(ns("genotype_list_select")),
           htmlOutput(ns("select_row")),
           actionButton(ns("add_row"), "Add empty row below selected"),
-          actionButton(ns("delete_row"), "Delete selected row"),
-          #actionButton(ns("extract_synteny"), "Extract synteny sequences"),
+          actionButton(ns("delete_row"), "Delete selected row")
+          
        ),
                    
        mainPanel(width=8,
@@ -36,13 +36,16 @@ correctMatches <- function(input, output, session, project_name) {
   output$select_row <- renderUI({
     selectizeInput(ns("select_row"), "Select Row:", choices=c(0, row_list()), multiple=FALSE)
   })
-  
+  ?assert
   # Save the custom_loci table edits in this reactiveValues
   temp_file <-  reactiveVal()
   temp_table <- reactiveVal()
   observeEvent(input$select_genotype, {
     temp_file(paste("projects/",project_name(), "/custom_loci/custom_loci_", input$select_genotype, ".csv", sep=""))
-    temp_table(read.csv(temp_file()))
+    tmp <- try(read.csv(temp_file()), silent = TRUE)
+    if(class(tmp) == "try-error"){
+      temp_table(data.frame())
+    } else{temp_table(tmp)}
   })
   
   # 
@@ -92,23 +95,4 @@ correctMatches <- function(input, output, session, project_name) {
     temp_table(tmp)
     write.csv(temp_table(), temp_file(), quote=F, row.names = F)
   })
-  
-  
-  
-  
-  
-  
-  
-  #working_table <- reactiveVal()
-  #observeEvent(input$extract_synteny, {
-  #  print("Delete previous fasta")
-  #  system(paste("rm projects/", project_name(), "/fasta_loci/combined.fasta", sep=""))
-  #  system(paste("rm projects/", project_name(), "/fasta_loci/combined_masked.fasta", sep=""))
-  #  print("start extract_results")
-  #  system(paste("python3 global/extract_results.py", project_name(), sep=" "))
-  #  print("read raw_overlap_list")
-  #  working_table(read.table(paste("projects/", project_name(),"/raw_overlap_list.tsv", sep=""), sep="\t"))
-  #  output$synteny_table <- renderDataTable(working_table(),
-  #                                        options = list(pageLength = 100, width="100%", scrollX = TRUE))
-  #})
 }

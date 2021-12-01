@@ -1,0 +1,17 @@
+,name,feature,start,end,strand
+1,LB,mRNA,1,1833,+
+2,exon1,exon,1,495,+
+3,exon2,exon,621,742,+
+4,exon3,exon,894,934,+
+5,exon4,exon,1144,1242,+
+6,exon5,exon,1662,1833,+
+7,PAN1,mRNA,3350,5432,+
+8,exon1,exon,3350,4715,+
+9,exon2,exon,4810,5432,+
+10,RB,mRNA,96435,99191,-
+11,exon6,exon,96435,96716,-
+12,exon5,exon,96883,96936,-
+13,exon4,exon,97021,97081,-
+14,exon3,exon,97703,97761,-
+15,exon2,exon,97902,97970,-
+16,exon1,exon,98855,99191,-
